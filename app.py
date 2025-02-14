@@ -13,7 +13,7 @@ def show_popup():
     st.markdown("""
     1. This tool is for personal chat analysis only.
     2. We do not store any uploaded data.
-    3. Ensure the uploaded file follows the correct format.
+    3. Ensure the uploaded file follows the correct format (.txt).
     4. The analysis results are based on the provided chat data.
     5. By proceeding, you agree to these terms.
     """)
@@ -67,58 +67,63 @@ else:
     theme = st.sidebar.radio("🎨 Choose Theme", ["Light", "Dark"])
     apply_theme(theme)
 
+    # File upload validation
     uploaded_file = st.sidebar.file_uploader("📂 Upload a WhatsApp chat file", type=["txt"])
+    
     if uploaded_file is not None:
-        bytes_data = uploaded_file.getvalue()
-        data = bytes_data.decode("utf-8")
-        df = preprocessor.preprocess(data)
+        if not uploaded_file.name.endswith(".txt"):
+            st.sidebar.warning("⚠️ Please upload a valid **.txt** file!")
+        else:
+            bytes_data = uploaded_file.getvalue()
+            data = bytes_data.decode("utf-8")
+            df = preprocessor.preprocess(data)
 
-        user_list = df['user'].unique().tolist()
-        if 'group_notification' in user_list:
-            user_list.remove('group_notification')
-        user_list.sort()
-        user_list.insert(0, "Overall")
+            user_list = df['user'].unique().tolist()
+            if 'group_notification' in user_list:
+                user_list.remove('group_notification')
+            user_list.sort()
+            user_list.insert(0, "Overall")
 
-        selected_user = st.sidebar.selectbox("📊 Show analysis for", user_list)
+            selected_user = st.sidebar.selectbox("📊 Show analysis for", user_list)
 
-        if st.sidebar.button("🔍 Show Analysis"):
-            num_messages, words, num_media_messages, num_links = helper.fetch_stats(selected_user, df)
+            if st.sidebar.button("🔍 Show Analysis"):
+                num_messages, words, num_media_messages, num_links = helper.fetch_stats(selected_user, df)
 
-            st.title("📊 Chat Analysis Summary")
-            col1, col2, col3, col4 = st.columns(4)
-            col1.metric("💬 Total Messages", num_messages)
-            col2.metric("📝 Total Words", words)
-            col3.metric("📷 Media Shared", num_media_messages)
-            col4.metric("🔗 Links Shared", num_links)
+                st.title("📊 Chat Analysis Summary")
+                col1, col2, col3, col4 = st.columns(4)
+                col1.metric("💬 Total Messages", num_messages)
+                col2.metric("📝 Total Words", words)
+                col3.metric("📷 Media Shared", num_media_messages)
+                col4.metric("🔗 Links Shared", num_links)
 
-            st.title("📅 Monthly Timeline")
-            timeline = helper.monthly_timeline(selected_user, df)
-            fig, ax = plt.subplots()
-            ax.plot(timeline['time'], timeline['message'], color='#e63946', linewidth=2)
-            plt.xticks(rotation='vertical')
-            st.pyplot(fig)
+                st.title("📅 Monthly Timeline")
+                timeline = helper.monthly_timeline(selected_user, df)
+                fig, ax = plt.subplots()
+                ax.plot(timeline['time'], timeline['message'], color='#e63946', linewidth=2)
+                plt.xticks(rotation='vertical')
+                st.pyplot(fig)
 
-            st.title("🔥 Weekly Activity Heatmap")
-            user_heatmap = helper.activity_heatmap(selected_user, df)
-            fig, ax = plt.subplots()
-            sns.heatmap(user_heatmap, cmap="magma", ax=ax)
-            st.pyplot(fig)
+                st.title("🔥 Weekly Activity Heatmap")
+                user_heatmap = helper.activity_heatmap(selected_user, df)
+                fig, ax = plt.subplots()
+                sns.heatmap(user_heatmap, cmap="magma", ax=ax)
+                st.pyplot(fig)
 
-            st.title("☁️ WordCloud")
-            df_wc = helper.create_wordcloud(selected_user, df)
-            fig, ax = plt.subplots()
-            ax.imshow(df_wc, interpolation='bilinear')
-            plt.axis("off")
-            st.pyplot(fig)
+                st.title("☁️ WordCloud")
+                df_wc = helper.create_wordcloud(selected_user, df)
+                fig, ax = plt.subplots()
+                ax.imshow(df_wc, interpolation='bilinear')
+                plt.axis("off")
+                st.pyplot(fig)
 
-            st.sidebar.markdown("---")
-            st.sidebar.header("📥 Export Data")
-            csv = df.to_csv(index=False)
-            st.sidebar.download_button(
-                label="⬇️ Download Analyzed Data",
-                data=csv,
-                file_name="analyzed_data.csv",
-                mime="text/csv"
-            )
-            st.markdown("---")
-            st.write("👨‍💻 Developed by: [Md Afzal]")
+                st.sidebar.markdown("---")
+                st.sidebar.header("📥 Export Data")
+                csv = df.to_csv(index=False)
+                st.sidebar.download_button(
+                    label="⬇️ Download Analyzed Data",
+                    data=csv,
+                    file_name="analyzed_data.csv",
+                    mime="text/csv"
+                )
+                st.markdown("---")
+                st.write("👨‍💻 Developed by: [Md Afzal]")
