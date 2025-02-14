@@ -9,21 +9,20 @@ extractor = URLExtract()
 
 
 def fetch_stats(selected_user, df):
-    print("DEBUG: fetch_stats() called with user:", selected_user)
-
     if selected_user != "Overall":
         df = df[df['user'] == selected_user]
 
-    print("DEBUG: DataFrame after filtering:\n", df.head())
+    # Ensure there is data to analyze
+    if df.empty:
+        return 0, 0, 0, 0  # Return zeros if no messages
 
-    num_messages = df.shape[0]  # Total messages
-    words = df['message'].apply(lambda x: len(x.split())).sum()  # Total words
-    num_media_messages = df[df['message'] == "<Media omitted>"].shape[0]  # Media messages
-    num_links = df['message'].str.contains('http|www', na=False).sum()  # Links
-
-    print("DEBUG: Stats calculated:", num_messages, words, num_media_messages, num_links)
+    num_messages = df.shape[0]
+    words = df['message'].apply(lambda x: len(x.split())).sum()
+    num_media_messages = df[df['message'].str.contains(r'http', na=False)].shape[0]
+    num_links = df[df['message'].str.contains(r'http', na=False)].shape[0]
 
     return num_messages, words, num_media_messages, num_links
+
 
 
 

@@ -52,7 +52,7 @@ def apply_theme(theme):
                 color: #000000;
             }
             h1, h2, h3, h4, h5, h6, p, label {
-                color: #fff; /* Indigo */
+                color: #4b0082; /* Indigo */
             }
             .stButton>button, .stDownloadButton>button {
                 background-color: #4b0082; /* Indigo */
@@ -81,6 +81,7 @@ def apply_theme(theme):
             """,
             unsafe_allow_html=True
         )
+
 
 
 st.sidebar.title("🚀 WhatsApp Chat Analyzer")
