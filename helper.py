@@ -18,7 +18,11 @@ def fetch_stats(selected_user, df):
 
     num_messages = df.shape[0]
     words = df['message'].apply(lambda x: len(x.split())).sum()
-    num_media_messages = df[df['message'].str.contains(r'http', na=False)].shape[0]
+    
+    # Count media messages (e.g., messages containing 'Media omitted')
+    num_media_messages = df[df['message'].str.contains('Media omitted', case=False, na=False)].shape[0]
+    
+    # Count messages containing URLs
     num_links = df[df['message'].str.contains(r'http', na=False)].shape[0]
 
     return num_messages, words, num_media_messages, num_links
