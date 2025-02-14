@@ -3,18 +3,23 @@ import pandas as pd
 
 
 def preprocess(data):
-    pattern = r'\d{1,2}/\d{1,2}/\d{2,4},\s\d{1,2}:\d{2}\s-\s'
+    pattern = r'\d{1,2}/\d{1,2}/\d{2,4},\s\d{1,2}:\d{2}\s[APap][Mm]\s-\s'
+
 
     # Split messages and extract dates
     messages = re.split(pattern, data)[1:]
     dates = re.findall(pattern, data)
+
+    print("EXTRACTED DATES:", dates[:5])  # Print first 5 timestamps
+    print("EXTRACTED MESSAGES:", messages[:5])  # Print first 5 messages
 
     # Create DataFrame with message and date
     df = pd.DataFrame({'user_message': messages, 'message_date': dates})
 
     # Clean up the date format
     df['message_date'] = df['message_date'].astype(str).str.strip(" - ")
-    df['message_date'] = pd.to_datetime(df['message_date'], format='%d/%m/%y, %H:%M')
+    df['message_date'] = pd.to_datetime(df['message_date'], format='%d/%m/%y, %I:%M %p')
+
 
     # Rename 'message_date' to 'date'
     df.rename(columns={'message_date': 'date'}, inplace=True)

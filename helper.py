@@ -9,21 +9,22 @@ extractor = URLExtract()
 
 
 def fetch_stats(selected_user, df):
-    if selected_user != 'Overall':
+    print("DEBUG: fetch_stats() called with user:", selected_user)
+
+    if selected_user != "Overall":
         df = df[df['user'] == selected_user]
 
-    num_messages = df.shape[0]
-    words = []
-    for message in df['message']:
-        words.extend(message.split())
+    print("DEBUG: DataFrame after filtering:\n", df.head())
 
-    num_media_messages = df[df['message'] == '<Media omitted>\n'].shape[0]
+    num_messages = df.shape[0]  # Total messages
+    words = df['message'].apply(lambda x: len(x.split())).sum()  # Total words
+    num_media_messages = df[df['message'] == "<Media omitted>"].shape[0]  # Media messages
+    num_links = df['message'].str.contains('http|www', na=False).sum()  # Links
 
-    links = []
-    for message in df['message']:
-        links.extend(extractor.find_urls(message))
+    print("DEBUG: Stats calculated:", num_messages, words, num_media_messages, num_links)
 
-    return num_messages, len(words), num_media_messages, len(links)
+    return num_messages, words, num_media_messages, num_links
+
 
 
 def most_busy_users(df):

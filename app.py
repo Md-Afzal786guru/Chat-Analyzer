@@ -95,7 +95,9 @@ if uploaded_file is not None:
     bytes_data = uploaded_file.getvalue()
     data = bytes_data.decode("utf-8")
     df = preprocessor.preprocess(data)
-
+    print("DATAFRAME PREVIEW:\n", df.head())  # Show first 5 rows
+    print("COLUMN DATA TYPES:\n", df.dtypes)
+    print("TOTAL ROWS:", len(df))
     # Fetch unique users
     user_list = df['user'].unique().tolist()
     if 'group_notification' in user_list:
@@ -106,7 +108,14 @@ if uploaded_file is not None:
     selected_user = st.sidebar.selectbox("📊 Show analysis for", user_list)
 
     if st.sidebar.button("🔍 Show Analysis"):
+        print("DEBUG: Running fetch_stats...")
+        print("SELECTED USER:", selected_user)
+        print("DATAFRAME PREVIEW BEFORE ANALYSIS:\n", df.head())
+
         num_messages, words, num_media_messages, num_links = helper.fetch_stats(selected_user, df)
+
+        print("RESULTS:", num_messages, words, num_media_messages, num_links)
+
         st.title("📊 Chat Analysis Summary")
 
         col1, col2, col3, col4 = st.columns(4)
@@ -221,4 +230,4 @@ if uploaded_file is not None:
             mime="text/csv"
         )
         st.markdown("---")
-        st.write("👨‍💻 Developed by: [Md Afzal]") 
+        st.write("👨‍💻 Developed by: [Md Afzal]")
