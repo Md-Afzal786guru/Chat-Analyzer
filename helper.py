@@ -5,7 +5,7 @@ import pandas as pd
 from collections import Counter
 import emoji
 
-extractor = URLExtract()
+extractor: URLExtract = URLExtract()
 
 
 def fetch_stats(selected_user, df):
@@ -143,7 +143,10 @@ def activity_heatmap(selected_user, df):
 def most_active_hours(selected_user, df):
     if selected_user != "Overall":
         df = df[df['user'] == selected_user]
-    active_hours = df.groupby('hour').size()
+
+    # Correct the column name from 'hour' to 'Hour'
+    active_hours = df.groupby('Hour').size()
 
     return active_hours
+
 
